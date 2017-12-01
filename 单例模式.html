@@ -1,0 +1,83 @@
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    单例是保证一个类只有一个实例，并提供一个访问它的全局访问点<br>
+    通用模型为：<br>
+    var obj<br>
+    function () {<br>
+      if (!obj) { obj = xxx }<br>
+      return obj<br>
+    }<br>
+</body>
+<script>
+  var module1 = (function () {
+    //使用单例创建div,也属于惰性加载单例，使用时创建单例
+    var CreateDiv = (function () {
+      var instance
+      //返回创建单例的类
+      var CreateDiv = function (html) {
+        //判断单例是否存在，存在则返回，不存在则创建新的
+        if (instance) {
+          return instance
+        }
+        this.html = html
+        this.init()
+        //默认返回this，这里可不需要return
+        return instance = this
+      }
+      CreateDiv.prototype.init = function () {
+        var div = document.createElement("div")
+        div.innerHTML = this.html
+        document.body.appendChild(div)
+      }
+      return CreateDiv
+    })()
+    //true
+    new CreateDiv('luka') === new CreateDiv('yueyue')
+  })()
+
+
+  //用代理模式分离创建对象和管理单例
+  var module2 = (function () {
+    //CreateDiv负责创建对象
+    var CreateDiv = function (html) {
+      this.html = html
+      this.init()
+    }
+    CreateDiv.prototype.init = function () {
+      var div = document.createElement("div")
+      div.innerHTML = this.html
+      document.body.appendChild(div)
+    }
+    var proxy = function (create) {
+      var instance
+      return function () {
+        return instance || (instance = new create(...arguments))
+      }
+    }
+    var createSingleDiv = proxy(CreateDiv)
+    //true
+    createSingleDiv("wtf") === createSingleDiv("luka")
+  })()
+
+  var module3 = (function () {
+    //可以剥离创建对象和管理单例方法
+    //管理单例的方法
+    var getSingle = function (fn) {
+      var result
+      return function () {
+        return result || (result = fn.apply(this, arguments))
+      }
+    }
+    //创建单例的方法
+    var createIframe = function () {
+      var iframe = document.createElement('iframe')
+      return document.body.appendChild(iframe)
+    }
+    //创建一个iframe
+    var createSingleIframe = getSingle(createIframe)
+    createSingleIframe()
+  })()
+
+</script>

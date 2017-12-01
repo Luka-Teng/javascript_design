@@ -1,0 +1,72 @@
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+  function a() { }<br>
+  a是对象，这个对象内部会有arguments，caller，length，prototype，__proto__等属性<br>
+  1. prototype是构造函数特有的原型属性，其内部指向一个对象，a.prototype有constructor属性，指向a本身，<br>
+     也有对象都存在的__proto__属性，指向Obejct.prototype。<br>
+  2. __proto__是所有对象丢存在的属性，指向起构造器的prototype，a.__proto__指向Function.prototype，<br>
+  3. 原型链的查找方式是，instace1 --> instance1.__proto__ --> function1.prototype --> instance2 --> instanc2.__proto__ --> function2...<br>
+     本质上就是 instace1.__proto__.__proto__.__proto__.__proto__... === Object.prototype<br>
+  4. a如果直接当方法使用的话，内部的this都指向window(一般情况下)，如果用new来创建的话则指向这个新对像，<br>
+     内部如果有return的则会替代this返回return的值
+</body>
+<script>
+  //javascript 实现AOP，分离主要业务逻辑和无关功能逻辑
+  Function.prototype.before = function (beforefn) {
+    //保存原函数的引用
+    var __self = this
+    return function () {
+      //函数中包含原函数的执行和beforefn的执行
+      beforefn.apply(this, arguments)
+      return __self.apply(this, arguments)
+    }
+  }
+  Function.prototype.after = function (afterfn) {
+    var __self = this
+    return function () {
+      var ret = __self.apply(this. arguments)
+      afterfn.apply(this, arguments)
+      return ret
+    }
+  }
+
+  var func = function () {
+    console.log(2)
+    return "AOP"
+  }
+  func = func.before(function () {
+    console.log(1)
+  }).after(function () {
+    console.log(3)
+  })
+
+  /******************************/
+
+  //curring function 函数柯里化，函数式编程，函数接受参数，不会直接求值而是返回函数，并保存参数结果，待要求值是一次性求值
+  var currying = function (fn) {
+    var args = []
+    return function () {
+      if (arguments.length === 0) {
+        //当不带参数的时候，执行fn求值
+        return fn.apply(this, args)
+      } else {
+        //当带参数时存储args变量
+        [].push.apply(args, arguments)
+        //返回原函数，提供链式调用
+        return arguments.callee
+      }
+    }
+  }
+
+  var cost = (function () {
+    var money = 0
+    return function () {
+      for (let i = 0, l = arguments.length; i < l; i++) {
+        money += arguments[i]
+      }
+      return money
+    }
+  })()
+</script>
