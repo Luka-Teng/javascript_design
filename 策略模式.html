@@ -1,0 +1,32 @@
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    策略模式： 定义一系列算法，把它们一个个封装去其阿里，并且是她们可以互相替换<br>
+    此模式一般有策略类或者对象来封装算法，一个执行者context来执行策略
+</body>
+<script>
+  const module = (function () {
+    const argToArr = function (arg) {
+      return Array.prototype.slice.apply(arg)
+    }
+    //定义策略对象，内部封装算法
+    const strategy = {
+      algorithm_1 () {
+        arguments = argToArr(arguments)
+        console.log("al1:"+arguments)
+      },
+      algorithm_2 () {
+        arguments = argToArr(arguments)
+        console.log("al2:"+arguments)
+      }
+    }
+    //定义执行者
+    let context = function (algorithm) {
+      Array.prototype.shift(arguments)
+      arguments = argToArr(arguments)
+      strategy[algorithm].apply(this, arguments)
+    }
+    context('algorithm_1', 'kkkkkk')
+  })()
+</script>
