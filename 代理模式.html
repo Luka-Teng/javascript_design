@@ -1,0 +1,68 @@
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    代理模式： 为一个对象(函数也是对象)提供一个代理访问器，来控制对这个对象的访问<br>
+    js常用的代理：虚拟代理，缓存代理
+</body>
+<script>
+  const module1 = (function () {
+    //虚拟代理是将本体需要执行的操作，通过代理操作，整合到需要时再执行
+    //图片预加载代理
+    //创建图片类的本体，类开放对image加载的方法
+    class myImage {
+      constructor () {
+        this.imageNode = document.createElement('img')
+        document.body.appendChild(this.imageNode)
+      }
+      setSrc (src) {
+        this.imageNode.src = src
+      }
+    }
+    //代理图片创建类，延迟加载，等待图片缓存后在进行加载
+    class proxyImage {
+      constructor (src) {
+        let p_image = document.createElement('img')
+        let n_image = new myImage()
+        p_image.onload = function () {
+          //缓存成功后加载图片
+          n_image.setSrc(src)
+        }
+        //缓存前先用预留图片
+        n_image.setSrc('images/loading.jpg')
+        //缓存图片a
+        p_image.src = src
+        return n_image
+      }
+    }
+    //用代理创建图片
+    var image = new proxyImage("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1512473537471&di=8c752e50f14fb53baad02d5a0ec6436b&imgtype=0&src=http%3A%2F%2Fimg.mukewang.com%2F55a75e740001313519201080.jpg")
+    return image
+  })()
+
+  const module2 = (function () {
+    //用缓存代理来决定是否直接对本体进行访问
+    //计算乘机本体
+    var mult = function () {
+      var a = 1
+      for (let i = 0, l = arguments.length; i < l; i++) {
+        a = a * arguments[i]
+      }
+      return a
+    }
+    //代理乘机
+    var proxyMult = (function () {
+      //缓存
+      let cache = {}
+      return function () {
+        let args = Array.prototype.join.call(arguments, ',')
+        //直接用in判断是否存在，真tm方便
+        if (args in cache) {
+          return cache[args]
+        }
+        return cache[args] = mult.apply(this, arguments)
+      }
+    })()
+    console.log(proxyMult(1,23,4))
+  })()
+</script>
