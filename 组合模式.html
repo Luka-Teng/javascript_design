@@ -1,0 +1,55 @@
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    组合模式是将对象组合成树的形状，组合对象和单个有同名接口，典型例子如遍历文件
+</body>
+<script>
+  const module = (function () {
+    // 遍历文件操作
+    // 文件类，提供scan, add接口
+    class File {
+      constructor (name, content = null) {
+        this.name = name
+        this.content = content
+      }
+      scan () {
+        console.log(`File ${this.name} : ${this.content}`)
+      }
+      add (file) {
+        throw Error('unable to add sub-files')
+      }
+    }
+
+    //文件夹类，提供scan，add接口
+    class Directory {
+      constructor (name) {
+        this.name = name
+        this.files = []
+      }
+      scan () {
+        console.log(`begin to scanning the directory : ${this.name}`)
+        for (let i in this.files) {
+          this.files[i].scan()
+        }
+      }
+      add (file) {
+        if ((file instanceof File) || (file instanceof Directory)) {
+          this.files.push(file)
+        }
+      }
+    }
+
+    //测试
+    const f1 = new File('file1', 'file1')
+    const f2 = new File('file2', 'file2')
+    const f3 = new File('file3', 'file3')
+    const d1 = new Directory('directory1')
+    const d2 = new Directory('directory2')
+    d1.add(f1)
+    d1.add(f2)
+    d2.add(d1)
+    d2.add(f3)
+    d2.scan()
+  })()
+</script>
