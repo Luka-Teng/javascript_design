@@ -1,0 +1,58 @@
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    发布订阅模式在js一般类似事件订阅模型，订阅者订阅事件，发布者触发事件
+</body>
+<script>
+  const module = (function () {
+    // 事件的全局对象， bus
+    const bus = {
+      // 订阅信息集合的对象
+      clientLists : {},
+
+      //将订阅的信息存入clientList
+      listen (key, fn) {
+        if (!this.clientLists[key]) {
+          this.clientLists[key] = []
+        }
+        this.clientLists[key].push(fn)
+      },
+
+      //触发订阅的信息
+      trigger (key, ...args) {
+        let fns = this.clientLists[key]
+        if (!fns || fns.length === 0) {
+          return false
+        }
+        for (let i in fns) {
+          fns[i].apply(null, args)
+        }
+      },
+
+      //删除订阅的信息
+      remove (key, fn) {
+        let fns = this.clientLists[key]
+        if (!fns || fns.length === 0) {
+          return false
+        }
+        if (!fn) {
+          fns && (fns = [])
+        } else {
+          for (let i in fns) {
+            if (fns[i] === fn) {
+              fn.splice(i,1)
+            }
+          }
+        }
+      }
+    }
+
+    //订阅消息
+    bus.listen('bus1', (data) => {
+      console.log(data)
+    })
+    bus.trigger('bus1', 'this is the first bus')
+
+  })()
+</script>

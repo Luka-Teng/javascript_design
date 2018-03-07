@@ -1,0 +1,58 @@
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    命令模式是指将命令者和接受者解耦，命令这不需要知道命令接受者是谁，也不需要知道具体执行什么， 如点菜系统。
+</body>
+<script>
+  const module = (function () {
+    // 命令者为客户， 执行命令者为餐厅厨师， 实现命令者与执行的解耦，就要独立出命令类
+    // 餐厅的师傅
+    function Bao(food) {
+      return {
+        //Bao厨师的做菜过程
+        cook () {
+          console.log(`Bao is cooking ${food}`)
+        }
+      }
+    }
+
+    function Lee(food) {
+      return {
+        //Lee厨师的做菜过程
+        cook () {
+          console.log(`Lee is cooking ${food}`)
+        }
+      }
+    }
+
+    // 餐厅的菜单, 不同菜单对应不同厨师
+    const menu = {
+      'chicken': Bao('chinken'),
+      'chips': Bao('chips'),
+      'rice': Lee('rice')
+    }
+
+    // orderCommand, 执行命令的封装类
+    class OrderCommand {
+      constructor (food) {
+        if (menu[food]) {
+          //定义厨师，定义命令接受者
+          this.chef = menu[food]
+          //下单马上开始做菜
+          this.execute()
+        } else {
+          throw Error('invalid food', 'can not find such a food in menu')
+        }
+      }
+
+      //执行命令
+      execute () {
+          this.chef.cook()
+      }
+    }
+
+    //顾客点菜
+    let orderChicken = new OrderCommand('chicken')
+  })()
+</script>

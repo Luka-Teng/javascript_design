@@ -4,6 +4,7 @@
 <body>
   function a() { }<br>
   a是对象，这个对象内部会有arguments，caller，length，prototype，__proto__等属性<br>
+  0. caller指向调用该方法的方法，<br>
   1. prototype是构造函数特有的原型属性，其内部指向一个对象，a.prototype有constructor属性，指向a本身，<br>
      也有对象都存在的__proto__属性，指向Obejct.prototype。<br>
   2. __proto__是所有对象丢存在的属性，指向起构造器的prototype，a.__proto__指向Function.prototype，<br>
