@@ -1,0 +1,80 @@
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    装饰者模式，实现AOP，分离主要业务逻辑和无关功能逻辑
+</body>
+<script>
+  //利用Function实现before与after的装饰函数，返回新的函数来实现装饰者模式
+  const module1 = (function () {
+    //before中的函数会在原来函数之前调用
+    Function.prototype.before = function (beforefn) {
+      //保存原函数的引用
+      var __self = this
+      return function () {
+        //函数中包含原函数的执行和beforefn的执行
+        //这里的this指向正式调用的对象
+        beforefn.apply(this, arguments)
+        return __self.apply(this, arguments)
+      }
+    }
+
+    //after中的函数会在原来函数之后调用，其余与before同理
+    Function.prototype.after = function (afterfn) {
+      var __self = this
+      return function () {
+        var ret = __self.apply(this. arguments)
+        afterfn.apply(this, arguments)
+        return ret
+      }
+    }
+
+    //定义对象
+    let grade = {
+      score: 100,
+      show () {
+        console.log(`the score is ${this.score}`)
+      }
+    }
+
+    //为这个对象的show方法增加鼓励方法
+    grade.show = grade.show.before(function () {
+      if (this.score === 100 ) {
+        console.log("You are great!!!")
+      }
+    })
+
+    //grade.show被增强了
+    grade.show()
+  })()
+
+  //利用javascript提案的新特性decorator来实现装饰者函数，只能用来装饰类和类方法
+  //目前浏览器还未能实现
+  const module2 = (function () {
+    class Student {
+      constructor (name, grade) {
+        this.name = name
+        this.grade = grade
+      }
+
+      //挂载装饰器在函数前
+      @judge
+      setGrade (grade) {
+        this.grade = grade
+      }
+    }
+
+    //输出成绩的装饰函数，函数参数参考Object.defineProperty
+    function judge(target, name, descriptor) {
+      //保留原函数
+      var ret = descriptor.value;
+      descriptor.value = function(...args) {
+        console.log(`Your grade is ${args[0]}`);
+        return ret.apply(target, arguments);
+      };
+
+      return descriptor;
+    }
+
+  })()
+</script>
