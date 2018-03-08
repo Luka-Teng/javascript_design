@@ -1,0 +1,73 @@
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    模板方法类似于继承和接口，通过封装提高系统扩展性
+</body>
+<script>
+  const module = (function () {
+    // 现在的es6天然支持class写法，不过是function的语法糖
+
+    // javascript的继承
+    // 动物的模板，一个基本的类
+    class Animal {
+      constructor () {
+        //...
+      }
+      sound () {
+        //...
+      }
+    }
+
+    // 继承Dog继承了Animal
+    class Dog extends Animal {
+      constructor() {
+        super();
+      }
+      // 重写方法
+      sound () {
+        //...
+      }
+      // 定义新方法
+      eat () {
+        //...
+      }
+    }
+
+    // javascript模拟接口
+    // 定义的接口需要默认返回错误
+    // 定义行为的接口
+    // 定义行为接口的方法，方法必须被实现的类重写,否则报错。如果接口需要定义变量，也可先返回方法
+    const ActionInterface = {
+      name () {
+        throw Error('name should be rewritten as a variable')
+      },
+      eat () {
+        throw Error('eat function should be rewritten')
+      },
+      pee () {
+        throw Error('pee function should be rewritten')
+      }
+    }
+
+    // 人类来实现行为的接口
+    function Human() {
+
+    }
+
+    // 用Object.assign来实现implements相关的作用
+    Object.assign(Human.prototype, ActionInterface)
+
+    //重写接口方法
+    Human.prototype = {
+      name: 'haha',
+      eat () {
+        //...
+      },
+      pee () {
+        //...
+      }
+    }
+
+  })()
+</script>
