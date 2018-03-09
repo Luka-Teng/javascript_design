@@ -1,0 +1,145 @@
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    职责链模式是将职责的实现和职责传递解耦，职责的实现多为方法，他们被负责职责传递的对象串联，形成传递
+</body>
+<script>
+  // 同步调用的职责链
+  const module1 = (function () {
+    // 实现一个场景，有道数学题，可请教的人依次是学生，老师，教授
+    // 每个人都可以看做一个职责的实现者，他们能解决问题，也可能无法解决问题，没法解决的问题会传递给下一个人
+    // 学生职责的实现，需要载入的参数题目的难度
+    function student(difficulity) {
+      if (difficulity < 20) {
+        console.log('a student solve the problem')
+        return true
+      } else {
+        return false
+      }
+    }
+
+    // 老师职责的实现
+    function teacher(difficulity) {
+      if (difficulity < 40) {
+        console.log('a teacher solve the problem')
+        return true
+      } else {
+        return false
+      }
+    }
+
+    // 教授职责的实现
+    function professor(difficulity) {
+      if (difficulity < 60) {
+        console.log('a professor solve the problem')
+        return true
+      } else {
+        return false
+      }
+    }
+
+    // 职责链类
+    class Chain {
+      constructor (fn) {
+        this.fn = fn
+        this.nextExecutor = null
+      }
+
+      // 设定下一个执行者
+      setNextExecutor (executor) {
+        return this.nextExecutor = executor
+      }
+
+      // 执行执行者的职责
+      setRequest () {
+        let ret = this.fn.apply(this, arguments)
+        if (!ret) {
+          return this.nextExecutor && this.nextExecutor.setRequest.apply(this.nextExecutor, arguments);
+        }
+        return ret
+      }
+    }
+
+    let chain1 = new Chain(student)
+    let chain2 = new Chain(teacher)
+    let chain3 = new Chain(professor)
+    chain1.setNextExecutor(chain2)
+    chain2.setNextExecutor(chain3)
+    chain1.setRequest(30)
+  })()
+
+  // 异步调用的职责链，要类似于promise写法,显示的使用next()进行下一步
+  const module2 = (function () {
+    class Chain {
+      constructor (fn) {
+        this.fn = fn
+        this.nextExecutor = null
+      }
+
+      // 设定下一个执行者
+      setNextExecutor (executor) {
+        return this.nextExecutor = executor
+      }
+
+      //执行职责，但是不在关心是否调用下一个职责
+      run () {
+        this.fn.apply(this, arguments)
+      }
+
+      //调用下一个职责
+      next () {
+        if (this.nextExecutor) {
+          this.nextExecutor.run.apply(this.nextExecutor, arguments);
+        } else {
+          console.log('unable to invoke next chain and chain broken')
+        }
+      }
+    }
+
+    function student(difficulity) {
+      //模拟学生在思考
+      console.log('the student is thinking')
+      setTimeout(() => {
+        if (difficulity < 20) {
+          console.log('the student solve the problem')
+        } else {
+          console.log('the student failed')
+          this.next(difficulity)
+        }
+      }, 2000)
+    }
+
+    function teacher(difficulity) {
+      //模拟老师在思考
+      console.log('the teacher is thinking')
+      setTimeout(() => {
+        if (difficulity < 40) {
+          console.log('the teacher solve the problem')
+        } else {
+          console.log('the teacher failed')
+          this.next(difficulity)
+        }
+      }, 2000)
+    }
+
+    function professor(difficulity) {
+      //模拟教授在思考
+      console.log('the professor is thinking')
+      setTimeout(() => {
+        if (difficulity < 60) {
+          console.log('the professor solve the problem')
+        } else {
+          console.log('the professor failed')
+          this.next(difficulity)
+        }
+      }, 2000)
+    }
+
+    let chain1 = new Chain(student)
+    let chain2 = new Chain(teacher)
+    let chain3 = new Chain(professor)
+    chain1.setNextExecutor(chain2).setNextExecutor(chain3)
+    chain1.run(60)
+  })()
+</script>
